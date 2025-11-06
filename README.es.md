@@ -303,3 +303,47 @@ Asegúrate de editar las variables según tus necesidades y lee todas las tareas
 8. Agrega la dirección IP de tu sistema a *hosts.yml*.
 
 &nbsp;
+
+Ejecuta el playbook de requisitos usando la contraseña de root que especificaste durante la instalación del servidor:
+
+    ansible-playbook --inventory hosts.yml --ask-pass requirements-playbook.yml
+
+&nbsp;
+
+Ejecuta el playbook principal con la contraseña del nuevo usuario que especificaste en el archivo *variables.yml*:
+
+    ansible-playbook --inventory hosts.yml --ask-pass main-playbook.yml
+
+&nbsp;
+
+Si necesitas ejecutar los playbooks varias veces, recuerda usar la clave SSH y el nuevo puerto SSH:
+
+    ansible-playbook --inventory hosts.yml -e ansible_ssh_port=SSH_PORT --key-file /PATH/TO/SSH/KEY main-playbook.yml
+
+
+([Tabla de Contenidos](#tabla-de-contenidos))
+
+## El Servidor SSH
+
+### Nota Importante Antes de Hacer Cambios en SSH
+
+Es altamente recomendable que mantengas una 2da terminal abierta a tu servidor **antes de hacer y aplicar cambios en la configuración de SSH**. De esta manera, si te bloqueas fuera de tu 1ra sesión de terminal, aún tendrás una sesión conectada para poder arreglarlo.
+
+Gracias a [Sonnenbrand](https://github.com/Sonnenbrand) por esta [idea](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server/issues/56).
+
+### Claves Públicas/Privadas SSH
+
+#### Por Qué
+
+Usar claves públicas/privadas SSH es más seguro que usar una contraseña. También hace que sea más fácil y rápido conectarse a nuestro servidor porque no tienes que ingresar una contraseña.
+
+#### Cómo Funciona
+
+Consulta las referencias a continuación para más detalles pero, a alto nivel, las claves públicas/privadas funcionan usando un par de claves para verificar identidad.
+
+1. Una clave, la clave **pública**, **solo puede encriptar datos**, no desencriptarlos
+1. La otra clave, la clave **privada**, puede desencriptar los datos
+
+Para SSH, se crea una clave pública y privada en el cliente. Debes mantener ambas claves seguras, especialmente la clave privada. Aunque la clave pública está destinada a ser pública, es prudente asegurarse de que ninguna de las claves caiga en manos equivocadas.
+
+Cuando te conectas a un servidor SSH, SSH buscará una clave pública que coincida con el cliente desde el que te estás conectando en el archivo \`~/.ssh/authorized_keys\` en el servidor al que te estás conectando. Nota que el archivo está en la **carpeta home** del ID al que estás intentando conectarte. Entonces, después de crear la clave pública, necesitas agregarla a \`~/.ssh/authorized_keys\`. Un enfoque es copiarla a una memoria USB y transferirla físicamente al servidor. Otro enfoque es usar [\`ssh-copy-id\`](https://www.ssh.com/ssh/copy-id) para transferir y agregar la clave pública.
